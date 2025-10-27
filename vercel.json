@@ -1,0 +1,8 @@
+{
+  "buildCommand": "npm run build",
+  "ignoreCommand": "",
+  "env": {
+    "NEXT_TELEMETRY_DISABLED": "1",
+    "NEXT_DISABLE_ESLINT": "1"
+  }
+}
