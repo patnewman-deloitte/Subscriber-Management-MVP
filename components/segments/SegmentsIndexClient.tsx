@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { segmentDefinitions } from "@/lib/sample-data";
 import { SegmentDefinition, SegmentRuleGroup } from "@/lib/types";
 import { encodeRulesParam } from "@/lib/urlState";
-import { logAudit } from "@/lib/audit";
+import { logEvent } from "@/lib/audit";
 import { isBrowser } from "@/lib/is-browser";
 
 const cloneSegment = (segment: SegmentDefinition): SegmentDefinition => {
@@ -34,12 +34,7 @@ export const SegmentsIndexClient = () => {
   const handleDuplicate = (segment: SegmentDefinition) => {
     const duplicate = cloneSegment(segment);
     setSegments((prev) => [duplicate, ...prev]);
-    logAudit({
-      type: "segment-duplicate",
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
-      route: "/segments",
-      payload: { sourceId: segment.id, duplicateId: duplicate.id },
-    });
+    logEvent("segment-duplicate", { sourceId: segment.id, duplicateId: duplicate.id }, "/segments");
   };
 
   const handleRename = (segment: SegmentDefinition) => {
@@ -53,12 +48,7 @@ export const SegmentsIndexClient = () => {
           : item,
       ),
     );
-    logAudit({
-      type: "segment-rename",
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
-      route: "/segments",
-      payload: { segmentId: segment.id, name: nextName },
-    });
+    logEvent("segment-rename", { segmentId: segment.id, name: nextName }, "/segments");
   };
 
   const toggleArchive = (segment: SegmentDefinition) => {
@@ -69,12 +59,7 @@ export const SegmentsIndexClient = () => {
           : item,
       ),
     );
-    logAudit({
-      type: "segment-archive",
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
-      route: "/segments",
-      payload: { segmentId: segment.id, archived: !segment.archived },
-    });
+    logEvent("segment-archive", { segmentId: segment.id, archived: !segment.archived }, "/segments");
   };
 
   return (

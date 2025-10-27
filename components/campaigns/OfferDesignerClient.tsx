@@ -9,7 +9,7 @@ import { buildCampaignAssetsCsv, buildCampaignBriefHtml, formatEligibilitySummar
 import { loadCampaigns, saveCampaigns } from "@/lib/persistence";
 import { opportunities, segmentDefinitions } from "@/lib/sample-data";
 import { CopyLink } from "@/components/shared/CopyLink";
-import { logAudit } from "@/lib/audit";
+import { logEvent } from "@/lib/audit";
 import { isBrowser } from "@/lib/is-browser";
 
 const currency = new Intl.NumberFormat("en-US", {
@@ -56,12 +56,7 @@ export const OfferDesignerClient = () => {
     setSelectedId(id);
     const campaign = campaigns.find((item) => item.id === id);
     if (campaign) {
-      logAudit({
-        type: "campaign.select",
-        timestamp: new Date().toISOString(),
-        route: "/campaigns",
-        payload: { id, name: campaign.name },
-      });
+      logEvent("campaign.select", { id, name: campaign.name }, "/campaigns");
     }
   };
 
@@ -85,12 +80,7 @@ export const OfferDesignerClient = () => {
         : campaign,
     );
     persist(next);
-    logAudit({
-      type: "campaign.status",
-      timestamp: new Date().toISOString(),
-      route: "/campaigns",
-      payload: { id, status },
-    });
+    logEvent("campaign.status", { id, status }, "/campaigns");
   };
 
   const handleExportHtml = (campaign: CampaignBrief) => {
@@ -98,23 +88,13 @@ export const OfferDesignerClient = () => {
     const opportunity = findOpportunity(campaign.linkedOpportunityId);
     const html = buildCampaignBriefHtml(campaign, segment?.name ?? "Segment", opportunity?.title);
     download(new Blob([html], { type: "text/html" }), `offer-brief-${campaign.id}.html`);
-    logAudit({
-      type: "campaign.export.html",
-      timestamp: new Date().toISOString(),
-      route: "/campaigns",
-      payload: { id: campaign.id },
-    });
+    logEvent("campaign.export.html", { id: campaign.id }, "/campaigns");
   };
 
   const handleExportCsv = (campaign: CampaignBrief) => {
     const csv = buildCampaignAssetsCsv(campaign);
     download(new Blob([csv], { type: "text/csv" }), `offer-assets-${campaign.id}.csv`);
-    logAudit({
-      type: "campaign.export.csv",
-      timestamp: new Date().toISOString(),
-      route: "/campaigns",
-      payload: { id: campaign.id },
-    });
+    logEvent("campaign.export.csv", { id: campaign.id }, "/campaigns");
   };
 
   return (

@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-static";
+
 import { MonitoringClient } from "@/components/monitoring/MonitoringClient";
 import { AuditTrail } from "@/components/monitoring/AuditTrail";
 import { CopyLink } from "@/components/shared/CopyLink";

@@ -5,8 +5,7 @@ import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { getCopy } from "@/lib/i18n";
 import { useStore } from "@/lib/store";
-import { logAudit } from "@/lib/audit";
-import { format } from "date-fns";
+import { logEvent } from "@/lib/audit";
 import { LocaleToggle } from "@/components/shared/LocaleToggle";
 import { getInitials } from "@/components/shared/getInitials";
 import { useMemo } from "react";
@@ -29,12 +28,7 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
   const [auditOpen, setAuditOpen] = useState(false);
 
   useEffect(() => {
-    logAudit({
-      type: "route",
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
-      route: pathname,
-      payload: { pathname }
-    });
+    logEvent("route", { pathname }, pathname);
   }, [pathname]);
 
   const avatarLabel = useMemo(() => getInitials("Liberty Team"), []);
@@ -56,12 +50,7 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
             type="button"
             onClick={() => {
               setAuditOpen(true);
-              logAudit({
-                type: "audit.toggle",
-                timestamp: new Date().toISOString(),
-                route: pathname,
-                payload: { open: true },
-              });
+              logEvent("audit.toggle", { open: true }, pathname);
             }}
             className="text-brand underline"
           >
@@ -101,12 +90,7 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
         open={auditOpen}
         onClose={() => {
           setAuditOpen(false);
-          logAudit({
-            type: "audit.toggle",
-            timestamp: new Date().toISOString(),
-            route: pathname,
-            payload: { open: false },
-          });
+          logEvent("audit.toggle", { open: false }, pathname);
         }}
       />
     </div>

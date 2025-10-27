@@ -11,8 +11,8 @@ import {
 } from "@/lib/sample-data";
 import { MonitoringAlert, MonitoringSavedView } from "@/lib/types";
 import { loadMonitoringViews, saveMonitoringViews } from "@/lib/persistence";
-import { logAudit } from "@/lib/audit";
-import { loadRecharts } from "@/components/lazy/Chart";
+import { logEvent } from "@/lib/audit";
+import { loadRecharts } from "@/components/lazy/RechartsClient";
 import { isBrowser } from "@/lib/is-browser";
 
 const currency = new Intl.NumberFormat("en-US", {
@@ -97,12 +97,7 @@ export const MonitoringClient = () => {
   const handleApplyView = (view: MonitoringSavedView) => {
     setSelectedViewId(view.id);
     setFilters(view.filters);
-    logAudit({
-      type: "monitoring.view.apply",
-      timestamp: new Date().toISOString(),
-      route: "/monitoring",
-      payload: { id: view.id, name: view.name },
-    });
+    logEvent("monitoring.view.apply", { id: view.id, name: view.name }, "/monitoring");
   };
 
   const handleSaveView = () => {
@@ -121,22 +116,12 @@ export const MonitoringClient = () => {
     setViews(nextViews);
     saveMonitoringViews(nextViews);
     setSelectedViewId(newView.id);
-    logAudit({
-      type: "monitoring.view.save",
-      timestamp: now,
-      route: "/monitoring",
-      payload: { id: newView.id, name },
-    });
+    logEvent("monitoring.view.save", { id: newView.id, name }, "/monitoring");
   };
 
   const handleAcknowledgeAlert = (alert: MonitoringAlert) => {
     setAcknowledgedAlerts((prev) => new Set(prev).add(alert.id));
-    logAudit({
-      type: "monitoring.alert.ack",
-      timestamp: new Date().toISOString(),
-      route: "/monitoring",
-      payload: { id: alert.id, message: alert.message },
-    });
+    logEvent("monitoring.alert.ack", { id: alert.id, message: alert.message }, "/monitoring");
   };
 
   return (
@@ -289,12 +274,11 @@ export const MonitoringClient = () => {
             type="button"
             onClick={() => {
               setShowLineage((prev) => !prev);
-              logAudit({
-                type: "monitoring.lineage.toggle",
-                timestamp: new Date().toISOString(),
-                route: "/monitoring",
-                payload: { metric: metricSeries.metric, open: !showLineage },
-              });
+              logEvent(
+                "monitoring.lineage.toggle",
+                { metric: metricSeries.metric, open: !showLineage },
+                "/monitoring",
+              );
             }}
             className="mt-4 text-sm font-medium text-brand underline"
           >

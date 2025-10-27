@@ -4,7 +4,7 @@ import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { format } from "date-fns";
 import { useStore } from "@/lib/store";
-import { logAudit } from "@/lib/audit";
+import { logEvent } from "@/lib/audit";
 import { macroZones } from "@/lib/sample-data";
 import { isBrowser } from "@/lib/is-browser";
 import {
@@ -506,12 +506,7 @@ export const SegmentBuilderClient = () => {
     const snapshot = ensureGroup(JSON.parse(JSON.stringify(rules)) as SegmentRuleGroup);
     setVersions((prev) => [{ rules: snapshot, summary, timestamp }, ...prev]);
     setLastSaved(snapshot);
-    logAudit({
-      type: "segment-save-version",
-      timestamp,
-      route: "/segments/new",
-      payload: { summary, metrics },
-    });
+    logEvent("segment-save-version", { summary, metrics }, "/segments/new");
   };
 
   const handleRollback = (index: number) => {
@@ -519,12 +514,7 @@ export const SegmentBuilderClient = () => {
     if (!snapshot) return;
     const clone = ensureGroup(JSON.parse(JSON.stringify(snapshot)) as SegmentRuleGroup);
     setRules(clone);
-    logAudit({
-      type: "segment-rollback",
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
-      route: "/segments/new",
-      payload: { versionIndex: index },
-    });
+    logEvent("segment-rollback", { versionIndex: index }, "/segments/new");
   };
 
   const handleExportCsv = () => {
@@ -533,12 +523,7 @@ export const SegmentBuilderClient = () => {
       rows.push(`SEG${Date.now()}${idx},${macroZones[idx % macroZones.length]},es,postpaid`);
     }
     download(new Blob([rows.join("\n")], { type: "text/csv" }), `segment-export-${Date.now()}.csv`);
-    logAudit({
-      type: "segment-export-csv",
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
-      route: "/segments/new",
-      payload: { rows: rows.length },
-    });
+    logEvent("segment-export-csv", { rows: rows.length }, "/segments/new");
   };
 
   const handleExportBrief = () => {
@@ -548,12 +533,7 @@ export const SegmentBuilderClient = () => {
       .map(([channel, value]) => `<li>${channel}: ${value.toLocaleString()}</li>`)
       .join("")}</ul></section></body></html>`;
     download(new Blob([html], { type: "text/html" }), `segment-brief-${Date.now()}.html`);
-    logAudit({
-      type: "segment-export-brief",
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
-      route: "/segments/new",
-      payload: {},
-    });
+    logEvent("segment-export-brief", {}, "/segments/new");
   };
 
   useEffect(() => {
@@ -584,12 +564,7 @@ export const SegmentBuilderClient = () => {
 
   const applySeed = (seedFilters: RadarFilters) => {
     updateRules(() => buildRulesFromFilters(seedFilters));
-    logAudit({
-      type: "segment-apply-seed",
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
-      route: "/segments/new",
-      payload: seedFilters,
-    });
+    logEvent("segment-apply-seed", seedFilters, "/segments/new");
   };
 
   const contextOpportunity = seedOpportunityId ? findOpportunity(seedOpportunityId) : undefined;

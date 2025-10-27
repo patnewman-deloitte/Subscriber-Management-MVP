@@ -2,14 +2,16 @@
   "name": "converge-subscriber",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --no-inline-config || true"
+    "lint": "next lint --no-inline-config || true",
+    "postinstall": "next telemetry disable || true"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": "20.x"
   },
   "dependencies": {
     "date-fns": "3.6.0",

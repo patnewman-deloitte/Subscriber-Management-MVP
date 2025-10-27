@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-static";
+
 import { ExecutionBoard } from "@/components/execution/ExecutionBoard";
 import { CopyLink } from "@/components/shared/CopyLink";
 

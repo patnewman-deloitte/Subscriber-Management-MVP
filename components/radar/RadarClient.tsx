@@ -19,7 +19,7 @@ import { decodeContextFromSearch, decodeObjectiveFromSearch, decodeRadarFilters 
 import { adjustContext, defaultFiltersFromContext, deriveFilterSeedName, runContextStub } from "@/lib/llm-stub";
 import { defaultFilters, filterOpportunities, findOpportunity, buildOpportunitySnapshot } from "@/lib/radar";
 import { opportunities } from "@/lib/sample-data";
-import { logAudit } from "@/lib/audit";
+import { logEvent } from "@/lib/audit";
 import { Opportunity } from "@/lib/types";
 import { isBrowser } from "@/lib/is-browser";
 
@@ -132,12 +132,7 @@ export const RadarClient = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("context", encodeURIComponent(JSON.stringify(next)));
     updateSearch(params);
-    logAudit({
-      type: "radar-clarified",
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
-      route: "/radar",
-      payload: { updates },
-    });
+    logEvent("radar-clarified", { updates }, "/radar");
   };
 
   const handleModeChange = (nextMode: "context" | "filters") => {
@@ -151,12 +146,7 @@ export const RadarClient = () => {
       params.set("context", encodeURIComponent(JSON.stringify(context)));
     }
     updateSearch(params);
-    logAudit({
-      type: "radar-mode", 
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
-      route: "/radar",
-      payload: { mode: nextMode },
-    });
+    logEvent("radar-mode", { mode: nextMode }, "/radar");
   };
 
   const handleFilterChange = (next: RadarFilters) => {
@@ -169,12 +159,7 @@ export const RadarClient = () => {
   const handleResetFilters = () => {
     const base = context ? defaultFiltersFromContext(context) : defaultFilters;
     handleFilterChange(base);
-    logAudit({
-      type: "radar-filters-reset",
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
-      route: "/radar",
-      payload: base,
-    });
+    logEvent("radar-filters-reset", base, "/radar");
   };
 
   const handleSaveSeed = () => {
@@ -187,12 +172,7 @@ export const RadarClient = () => {
       filters,
     };
     addSeed(seed);
-    logAudit({
-      type: "radar-seed",
-      timestamp: seed.createdAt,
-      route: "/radar",
-      payload: seed,
-    });
+    logEvent("radar-seed", seed, "/radar");
   };
 
   const exportSnapshot = () => {
@@ -202,12 +182,7 @@ export const RadarClient = () => {
       .map((opp) => buildOpportunitySnapshot(opp, context, interpretation))
       .join("<hr style='margin:32px 0;border:none;border-top:1px solid #cbd5f5' />")}</body></html>`;
     download(new Blob([html], { type: "text/html" }), `radar-${Date.now()}.html`);
-    logAudit({
-      type: "radar-export",
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
-      route: "/radar",
-      payload: { mode, count: visibleOpportunities.length },
-    });
+    logEvent("radar-export", { mode, count: visibleOpportunities.length }, "/radar");
   };
 
   const contextMissing = mode === "context" && !context;

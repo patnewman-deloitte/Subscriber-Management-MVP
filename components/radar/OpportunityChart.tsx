@@ -5,7 +5,7 @@ import { opportunities } from "@/lib/sample-data";
 import { useSearchParams } from "next/navigation";
 import { decodeContextFromSearch } from "@/lib/urlState";
 import { runContextStub } from "@/lib/llm-stub";
-import { loadRecharts } from "@/components/lazy/Chart";
+import { loadRecharts } from "@/components/lazy/RechartsClient";
 import { isBrowser } from "@/lib/is-browser";
 
 export const OpportunityChart = () => {

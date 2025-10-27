@@ -1,38 +1,24 @@
-import { isBrowser } from "./is-browser";
-import { AuditEntry } from "./types";
+export type AuditEvent = { type: string; timestamp: string; payload?: any; route?: string };
 
-const STORAGE_KEY = "converge-subscriber-audit";
+export const logEvent = (type: string, payload?: any, route?: string) => {
+  if (typeof window === 'undefined') return;
+  const key = 'auditLog';
+  const now: AuditEvent = { type, payload, route, timestamp: new Date().toISOString() };
+  const arr = JSON.parse(localStorage.getItem(key) || '[]');
+  arr.push(now);
+  localStorage.setItem(key, JSON.stringify(arr));
+};
 
-const getEntries = (): AuditEntry[] => {
-  if (!isBrowser) return [];
+export const readAudit = (): AuditEvent[] => {
+  if (typeof window === 'undefined') return [];
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as AuditEntry[]) : [];
-  } catch (error) {
-    console.warn("Failed to read audit log", error);
+    return JSON.parse(localStorage.getItem('auditLog') || '[]');
+  } catch {
     return [];
   }
 };
 
-const persistEntries = (entries: AuditEntry[]) => {
-  if (!isBrowser) return;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-  } catch (error) {
-    console.warn("Failed to persist audit log", error);
-  }
-};
-
-export const logAudit = <T,>(entry: AuditEntry<T>) => {
-  if (!isBrowser) return;
-  const entries = getEntries();
-  entries.unshift(entry as AuditEntry);
-  persistEntries(entries.slice(0, 200));
-};
-
-export const readAudit = (): AuditEntry[] => getEntries();
-
 export const clearAudit = () => {
-  if (!isBrowser) return;
-  window.localStorage.removeItem(STORAGE_KEY);
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem('auditLog');
 };

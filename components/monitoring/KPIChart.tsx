@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { kpiBundles } from "@/lib/sample-data";
-import { loadRecharts } from "@/components/lazy/Chart";
+import { loadRecharts } from "@/components/lazy/RechartsClient";
 import { isBrowser } from "@/lib/is-browser";
 
 export const KPIChart = () => {

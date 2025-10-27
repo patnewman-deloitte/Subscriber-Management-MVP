@@ -3,8 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { encodeObjectiveToSearch } from "@/lib/urlState";
-import { logAudit } from "@/lib/audit";
-import { format } from "date-fns";
+import { logEvent } from "@/lib/audit";
 
 const objectives = [
   { id: "acquire", title: "Acquire" },
@@ -17,12 +16,7 @@ export const ObjectiveEntry = () => {
   const setObjective = useStore((state) => state.setObjective);
   const handleSelect = (objective: "acquire" | "grow" | "retain") => {
     setObjective(objective);
-    logAudit({
-      type: "objective-selected",
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
-      route: "/start",
-      payload: { objective }
-    });
+    logEvent("objective-selected", { objective }, "/start");
     router.push(`/radar?${encodeObjectiveToSearch(objective)}`);
   };
 

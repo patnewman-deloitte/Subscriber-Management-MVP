@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-static";
+
 import { ContextComposerForm } from "@/components/forms/ContextComposerForm";
 import { ObjectiveEntry } from "@/components/forms/ObjectiveEntry";
 import { useStore } from "@/lib/store";

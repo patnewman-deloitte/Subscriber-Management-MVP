@@ -6,7 +6,7 @@ import { executionPipeline, executionRisks, executionTasks } from "@/lib/sample-
 import { CampaignBrief, ReadinessCheck } from "@/lib/types";
 import { loadCampaigns } from "@/lib/persistence";
 import { segmentDefinitions } from "@/lib/sample-data";
-import { logAudit } from "@/lib/audit";
+import { logEvent } from "@/lib/audit";
 import { isBrowser } from "@/lib/is-browser";
 
 const readinessGuardrails = {
@@ -165,12 +165,7 @@ export const ExecutionBoard = () => {
     if (campaign) {
       const checks = computeReadiness(campaign);
       setReadiness(checks);
-      logAudit({
-        type: "execution.campaign.select",
-        timestamp: new Date().toISOString(),
-        route: "/execution",
-        payload: { id, name: campaign.name },
-      });
+      logEvent("execution.campaign.select", { id, name: campaign.name }, "/execution");
     }
   };
 
@@ -178,22 +173,16 @@ export const ExecutionBoard = () => {
     if (!selectedCampaign) return;
     const checks = computeReadiness(selectedCampaign);
     setReadiness(checks);
-    logAudit({
-      type: "execution.readiness",
-      timestamp: new Date().toISOString(),
-      route: "/execution",
-      payload: { id: selectedCampaign.id, passed: checks.every((check) => check.passed) },
-    });
+    logEvent(
+      "execution.readiness",
+      { id: selectedCampaign.id, passed: checks.every((check) => check.passed) },
+      "/execution",
+    );
   };
 
   const handleSendAlert = (message: string) => {
     setAlerts((prev) => [message, ...prev]);
-    logAudit({
-      type: "execution.notification",
-      timestamp: new Date().toISOString(),
-      route: "/execution",
-      payload: { message },
-    });
+    logEvent("execution.notification", { message }, "/execution");
   };
 
   const handleExportHtml = () => {
@@ -255,12 +244,7 @@ export const ExecutionBoard = () => {
   </body>
 </html>`;
     download(new Blob([html], { type: "text/html" }), `execution-status-${selectedCampaign.id}.html`);
-    logAudit({
-      type: "execution.export.html",
-      timestamp: new Date().toISOString(),
-      route: "/execution",
-      payload: { id: selectedCampaign.id },
-    });
+    logEvent("execution.export.html", { id: selectedCampaign.id }, "/execution");
   };
 
   const handleExportCsv = () => {
@@ -277,12 +261,7 @@ export const ExecutionBoard = () => {
     ]);
     const csv = [header.join(","), ...rows.map((row) => row.map((cell) => `"${cell}"`).join(","))].join("\n");
     download(new Blob([csv], { type: "text/csv" }), `execution-actions-${selectedCampaignId ?? "all"}.csv`);
-    logAudit({
-      type: "execution.export.csv",
-      timestamp: new Date().toISOString(),
-      route: "/execution",
-      payload: { campaignId: selectedCampaignId },
-    });
+    logEvent("execution.export.csv", { campaignId: selectedCampaignId }, "/execution");
   };
 
   if (campaigns.length === 0) {

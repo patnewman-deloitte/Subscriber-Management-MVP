@@ -11,7 +11,7 @@ import {
   Objective,
   Product,
 } from "@/lib/types";
-import { logAudit } from "@/lib/audit";
+import { logEvent } from "@/lib/audit";
 import { loadCampaigns, saveCampaigns } from "@/lib/persistence";
 import { opportunities, segmentDefinitions } from "@/lib/sample-data";
 
@@ -341,16 +341,15 @@ export const CampaignForm = ({ campaign, mode }: Props) => {
       campaigns.unshift(nextBrief);
     }
     saveCampaigns(campaigns);
-    logAudit({
-      type: mode === "create" ? "campaign.create" : "campaign.update",
-      timestamp: now.toISOString(),
-      route: mode === "create" ? "/campaigns/new" : `/campaigns/${id}`,
-      payload: {
+    logEvent(
+      mode === "create" ? "campaign.create" : "campaign.update",
+      {
         id,
         name: values.name,
         status: values.status,
       },
-    });
+      mode === "create" ? "/campaigns/new" : `/campaigns/${id}`,
+    );
     router.push(`/campaigns`);
   };
 

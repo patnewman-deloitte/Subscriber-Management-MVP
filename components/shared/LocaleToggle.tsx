@@ -2,8 +2,7 @@
 
 import { useStore } from "@/lib/store";
 import { getCopy } from "@/lib/i18n";
-import { logAudit } from "@/lib/audit";
-import { format } from "date-fns";
+import { logEvent } from "@/lib/audit";
 import { isBrowser } from "@/lib/is-browser";
 
 export const LocaleToggle = () => {
@@ -15,12 +14,7 @@ export const LocaleToggle = () => {
     if (!isBrowser) return;
     const next = locale === "en" ? "es" : "en";
     setLocale(next);
-    logAudit({
-      type: "locale",
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
-      route: window.location.pathname,
-      payload: { locale: next },
-    });
+    logEvent("locale", { locale: next }, window.location.pathname);
   };
 
   return (

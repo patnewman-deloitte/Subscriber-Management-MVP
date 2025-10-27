@@ -2,7 +2,7 @@
 
 import { memo, useEffect, useMemo, useState } from "react";
 import geoData from "@/lib/geo/pr-zones.json";
-import { loadSimpleMaps } from "@/components/lazy/PRMap";
+import { loadSimpleMaps } from "@/components/lazy/SimpleMapsClient";
 import { isBrowser } from "@/lib/is-browser";
 
 export interface ZoneHeatmapProps {

@@ -9,8 +9,7 @@ import { useStore } from "@/lib/store";
 import { getCopy } from "@/lib/i18n";
 import { encodeContextToSearch } from "@/lib/urlState";
 import { runContextStub } from "@/lib/llm-stub";
-import { logAudit } from "@/lib/audit";
-import { format } from "date-fns";
+import { logEvent } from "@/lib/audit";
 
 const formSchema = z.object({
   objective: z.enum(["acquire", "grow", "retain"]),
@@ -64,12 +63,7 @@ export const ContextComposerForm = () => {
     setLastContext(context);
     setObjective(values.objective);
     setRadarSeed(stub.rankedOpportunityIds[0]);
-    logAudit({
-      type: "context-interpreted",
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
-      route: "/start",
-      payload: { context, stub }
-    });
+    logEvent("context-interpreted", { context, stub }, "/start");
     router.push(`/radar?${encodeContextToSearch(context)}`);
   });
 

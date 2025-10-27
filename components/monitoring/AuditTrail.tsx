@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { readAudit, clearAudit } from "@/lib/audit";
-import { AuditEntry } from "@/lib/types";
+import { readAudit, clearAudit, type AuditEvent } from "@/lib/audit";
 
 export const AuditTrail = () => {
-  const [entries, setEntries] = useState<AuditEntry[]>([]);
+  const [entries, setEntries] = useState<AuditEvent[]>([]);
 
   useEffect(() => {
     setEntries(readAudit());

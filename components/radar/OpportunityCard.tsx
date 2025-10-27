@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { ContextComposerInput, ContextInterpretation, Opportunity } from "@/lib/types";
 import { format } from "date-fns";
 import { formattedTrend, formatEligibility, snapshotBlob } from "@/lib/radar";
-import { logAudit } from "@/lib/audit";
+import { logEvent } from "@/lib/audit";
 import { isBrowser } from "@/lib/is-browser";
 
 const ZoneHeatmap = dynamic(() => import("./ZoneMap").then((mod) => mod.ZoneHeatmap), { ssr: false });
@@ -53,21 +53,11 @@ export const OpportunityCard = ({ opportunity, context, interpretation }: Opport
   const exportSnapshot = () => {
     const blob = snapshotBlob(opportunity, context, interpretation);
     download(blob, `${opportunity.id}-snapshot.html`);
-    logAudit({
-      type: "radar-opportunity-export",
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
-      route: "/radar",
-      payload: { opportunityId: opportunity.id },
-    });
+    logEvent("radar-opportunity-export", { opportunityId: opportunity.id }, "/radar");
   };
 
   const handleOpenSegment = () => {
-    logAudit({
-      type: "radar-open-segment",
-      timestamp: format(new Date(), "yyyy-MM-dd'T'HH:mm:ssxxx"),
-      route: "/radar",
-      payload: { opportunityId: opportunity.id },
-    });
+    logEvent("radar-open-segment", { opportunityId: opportunity.id }, "/radar");
   };
 
   return (

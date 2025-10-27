@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { readAudit, clearAudit } from "@/lib/audit";
-import { AuditEntry } from "@/lib/types";
+import { readAudit, clearAudit, type AuditEvent } from "@/lib/audit";
 import { format } from "date-fns";
 
 interface Props {
@@ -13,7 +12,7 @@ interface Props {
 const formatTimestamp = (timestamp: string) => format(new Date(timestamp), "MMM d, HH:mm:ss");
 
 export const AuditDrawer = ({ open, onClose }: Props) => {
-  const [entries, setEntries] = useState<AuditEntry[]>([]);
+  const [entries, setEntries] = useState<AuditEvent[]>([]);
   const [filter, setFilter] = useState<string>("all");
 
   useEffect(() => {
